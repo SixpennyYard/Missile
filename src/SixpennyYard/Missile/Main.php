@@ -7,19 +7,14 @@ use pocketmine\entity\EntityDataHelper;
 use pocketmine\entity\EntityFactory;
 use pocketmine\entity\Human;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
-use pocketmine\event\entity\EntityDeathEvent;
-use pocketmine\event\entity\EntityDespawnEvent;
-use pocketmine\event\entity\EntityExplodeEvent;
 use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\item\VanillaItems;
 use pocketmine\player\Player;
 use pocketmine\plugin\PluginBase;
-use pocketmine\scheduler\Task;
-use pocketmine\world\Explosion;
-use pocketmine\world\Position;
 use SixpennyYard\Machine\EntityManager;
 use pocketmine\command\CommandSender;
 use pocketmine\command\Command;
+use TaskMissile;
 
 class Main extends PluginBase {
 
@@ -46,20 +41,11 @@ class Main extends PluginBase {
 
     public function onCommand(CommandSender $p, Command $cmd, String $label, array $args) : bool{
         if($cmd->getName() === 'missile'){
-            $arg = array_shift($args);
-            switch($arg){
-                case "remover":
-                    $remover = VanillaItems::STICK();
-                    $remover->setCustomName("§r§4Remover");
-                    $remover->setLore(["remover"]);
-                    $p->getInventory()->addItem($remover);
-                    break;
-                default:
-                    $item = VanillaItems::NETHER_STAR();
-                    $item->setCustomName("§rMissile T1");
-                    $item->setLore(["Missile"]);
-                    $p->getInventory()->addItem($item);
-                    break;
+            if ($p instanceof Player) {
+                $item = VanillaItems::NETHER_STAR();
+                $item->setCustomName("§rMissile T1");
+                $item->setLore(["Missile"]);
+                $p->getInventory()->addItem($item);
             }
             return true;
         }
@@ -76,7 +62,7 @@ class Main extends PluginBase {
             $missile = new EntityMissile($pos, $skin, $nbt);
             $missile->setSkin($skin);
             $missile->setScale(1);
-            $missile->setImmobile(true);
+            $missile->setImmobile();
             $missile->setNameTag("Missile");
             $missile->setHasGravity(true);
             $missile->setForceMovementUpdate(false);
@@ -93,52 +79,12 @@ class Main extends PluginBase {
 
         if ($entity instanceof EntityMissile){
             if ($player instanceof PLayer){
+                $event->cancel();
                 if ($player->isSneaking()){
                     $entity->flagForDespawn();
                 }
-            }
-        }
-    }
-    public function onDeath(EntityDeathEvent $event){
-        $entity = $event->getEntity();
-
-        if ($entity instanceof EntityMissile){
-            $explosion = new Explosion(new Position($entity->getPosition()->getX, $entity->getPosition()->getY,$entity->getPosition()->getZ, $entity->getWorld()), 3.4, $entity);
-            $explosion->explodeA();
-            $explosion->explodeB();
-        }
-    }
-    public function onExplodeEntity(EntityExplodeEvent $event){
-        $entity = $event->getEntity();
-        $block = $entity->getWorld()->getBlock($entity->getPosition());
-        $list = [];
-        if ($entity instanceof EntityMissile){
-            if (!$event->isCancelled()){
-                for($i = 0; $i <= (3.3*2); $i++) {
-                    $list[] = $block->getSide($i);
-                }
-            }
-        }
-    }
-}
-
-class TaskMissile extends Task
-{
-
-    public function __construct(Main $pl)
-    {
-        $this->pl = $pl;
-    }
-
-    public function onRun(): void
-    {
-        foreach ($this->pl->getServer()->getWorldManager()->getWorlds() as $w) {
-            foreach ($w->getEntities() as $ent) {
-                if ($ent instanceof EntityMissile) {
-                    $ent->setNameTagAlwaysVisible(false);
-                    $ent->setNameTagVisible(true);
-                    $ent->setScale(1);
-                }
+            }else{
+                $event->cancel();
             }
         }
     }
