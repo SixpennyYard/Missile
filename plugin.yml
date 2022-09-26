@@ -1,8 +1,7 @@
 ---
 name: Missile
-author: SixpennyYard
-version: 1.7.5
+version: 0.0.1
 main: SixpennyYard\Missile\Main
-api: [4.0.0]
-src-namespace-prefix: SixpennyYard\CustomJoin
+api: 4.9.0
+src-namespace-prefix: SixpennyYard\Missile
 ...

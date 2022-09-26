@@ -11,11 +11,6 @@ use SixpennyYard\Missile\Event\EventListener;
 
 class EntityMissile extends Human{
 
-    protected function getInitialSizeInfo(): EntitySizeInfo
-    {
-        return new EntitySizeInfo(1, 1.2, 0.8);
-    }
-
     public static function getNetworkTypeId(): string
     {
         return "missile:mob";

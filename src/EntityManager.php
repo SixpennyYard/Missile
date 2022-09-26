@@ -1,16 +1,21 @@
 <?php
 
-namespace SixpennyYard\Machine;
+namespace SixpennyYard\Missile;
 
+use pocketmine\Server;
 use pocketmine\player\Player;
+use pocketmine\entity\Entity;
+use pocketmine\entity\Human;
 use pocketmine\entity\Skin;
 use pocketmine\entity\Location;
+use pocketmine\entity\EntityDataHelper;
+use pocketmine\entity\EntityFactory;
 use pocketmine\math\Vector3;
 use pocketmine\nbt\tag\{CompoundTag, StringTag, ByteArrayTag, DoubleTag, FloatTag, ListTag, ShortTag};
 use SixpennyYard\Missile\Main;
 
 class EntityManager {
-    
+
     public static function getSkin($Texturefile, $geometryFile, $geometryIdentifier, $newName = "NewSkin"){
         $texturePath = Main::getInstance()->getDataFolder() . $Texturefile;
         if(!file_exists($texturePath)) return null;
@@ -34,7 +39,7 @@ class EntityManager {
         $newskin = new Skin($newName, $skinbytes, "", $geometryIdentifier, file_get_contents($modelPath));
         return $newskin;
     }
-    
+
     public static function getNBT(Player $player, Location $location){
         $nbt = self::createBaseNBT($location->asVector3(), null, $location->getYaw(), $location->getPitch());
         $nbt->setTag("Skin", CompoundTag::create()
@@ -46,7 +51,7 @@ class EntityManager {
         );
         return $nbt;
     }
-    
+
     public static function createBaseNBT(Vector3 $pos, ?Vector3 $motion = null, float $yaw = 0.0, float $pitch = 0.0): CompoundTag {
         return CompoundTag::create()
             ->setTag("Pos", new ListTag([
