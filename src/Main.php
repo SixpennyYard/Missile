@@ -79,7 +79,7 @@ class Main extends PluginBase {
     public function createPlatformAndMissile(Player $player, $pos){
         $skin = EntityManager::getSkin("machine.png", "machine.json", "geometry.machine", "PlatformAndMissile");
         $nbt = EntityManager::getNBT($player, $pos);
-        $platform = new PlatformEntity($pos, $skin, $nbt);
+        $platform = new FormEntity($pos, $skin, $nbt);
         $platform->setSkin($skin);
         $platform->setScale(1);
         $platform->setImmobile();
